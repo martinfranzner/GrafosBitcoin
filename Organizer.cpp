@@ -48,23 +48,29 @@ vector<int> Organizer::preparaVerticesAero(vector<string> linesOfTheFile){
     
     return vertices;
 }
-vector<pair<int,string>> Organizer::preparaVertices(vector<string> linesOfTheFile){
+vector<pair<int,string>> Organizer::preparaVerticesFromPajek(vector<string> linesOfTheFile){
     
         int j = 0;
         string aux = "";
         int indexVertice = 0;
+        char delimitadores[] = " <>[],;-\n\r    ";
         vector<pair<int,string>> vertices;
-
-        for(auto itera2 : linesOfTheFile){
+        vector<string> stringSplitada;
+        string arcs = "*Arcs";
+        for(auto itera : linesOfTheFile){
             if(j != 0){
-                aux = itera2.substr(0,5); 
-                indexVertice = atoi(aux.c_str());;
-                aux = itera2.substr(6, itera2.length());
+                if(itera.substr(0,1) == "*"){
+                    //cout<<itera.substr(0,1)<<endl;
+                    break;
+                }
+                stringSplitada = splitT(itera, delimitadores);
+                indexVertice = atoi(stringSplitada.at(0).c_str());
+                aux = stringSplitada.at(1);
                 vertices.push_back(make_pair(indexVertice,aux));
+                
+                
             }
             j++;
-                    if(indexVertice == 13356)
-                        break;
         }
 //            for (auto bla : vertices){
 //                cout<<bla.first<<"---"<<bla.second<<endl;
@@ -73,12 +79,13 @@ vector<pair<int,string>> Organizer::preparaVertices(vector<string> linesOfTheFil
         return vertices;
 }
 vector<Adjacencias> Organizer::preparaAdjacencias(vector<string> linesOfTheFile){
-    int j =0;
+    int j =0, i=0;
     char delimitadores[] = " <>[],;-\n\r    ";
     vector<string> stringSplitada;
     vector<Adjacencias> adjVet;
+    
     for(auto itera : linesOfTheFile){
-        if(j!=0){
+        if(j!=0 ){
             stringSplitada = splitT(itera, delimitadores);
             Adjacencias a;
             a.orig = stringSplitada.at(0);
@@ -95,6 +102,39 @@ vector<Adjacencias> Organizer::preparaAdjacencias(vector<string> linesOfTheFile)
     return adjVet;
 }
 
+vector<Adjacencias> Organizer::preparaAdjacenciasFromPajek(vector<string> linesOfTheFile){
+    int j =0,i=0;
+    char delimitadores[] = " <>[],;-\n\r    ";
+    vector<string> stringSplitada;
+    vector<Adjacencias> adjVet;
+    int numVertices;
+    
+    //pega o tamanho de vertices da primeira linha
+        stringSplitada = splitT(linesOfTheFile.at(0), delimitadores);
+//    for(auto it :stringSplitada){
+//        cout<<it<<endl;
+//    }
+    
+    numVertices = atoi(stringSplitada.at(1).c_str());
+
+    
+    for(auto itera : linesOfTheFile){
+        if(j!=0 && j> (numVertices+1)){
+            stringSplitada = splitT(itera, delimitadores);
+            Adjacencias a;
+            a.orig = stringSplitada.at(0);
+            a.dest = stringSplitada.at(1);
+            a.peso = atoi(stringSplitada.at(2).c_str());
+            adjVet.push_back(a);
+            
+            //            for(auto itvet : stringSplitada){
+            //                cout<<itvet<<endl;
+            //            }
+        }
+        j++;
+    }
+    return adjVet;
+}
 
 vector<string> Organizer::splitT1(char * str, char * delimiter){
     vector<string> * v = new vector<string>();

@@ -31,8 +31,9 @@ public:
     
     vector<int> preparaVerticesAero(vector<string> linesOfTheFile);
     
-    vector<pair<int,string>> preparaVertices(vector<string> linesOfTheFile);
+    vector<pair<int,string>> preparaVerticesFromPajek(vector<string> linesOfTheFile);
     vector<Adjacencias> preparaAdjacencias(vector<string> linesOfTheFile);
+    vector<Adjacencias> preparaAdjacenciasFromPajek(vector<string> linesOfTheFile);
     
     vector<string> splitT(const string str, const string delimiter);
     vector<string> splitT1(char * str, char * delimiter);

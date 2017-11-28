@@ -23,6 +23,8 @@ private:
     //list<int>* matrizAdj;
     list<No>* matrizAdj;
     NoGrafo *vertice;
+    //int *caminho;
+    int** fechamento;
     
 public:
     Grafo(int tamanho);//ja cria a matriz
@@ -39,5 +41,14 @@ public:
     bool ciclo(int origem, bool visitado[]);
     bool conexo(int origem, bool visitado[]);
     void PRIM(int start);
+    bool euleriano();
+    void noMaiorAdj();
+    void imprimirDijkstra(int s, int t);
+    int melhorCaminho(int s, int t);
+    int retornaPeso(int corrente, int i);
+    void faz_fechamento();
+    bool procura(int i, int j);
+    void rankingRecebidos();
+    void rankingEnviados();
 };
 #endif /* Grafo_hpp */

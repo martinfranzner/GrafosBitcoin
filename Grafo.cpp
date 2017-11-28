@@ -48,7 +48,7 @@ int Grafo::existeAdjascencia(int lin, int adjasen){
         p = *j;
         verifica = p.getAdj();
         if(verifica == adjasen){
-            j->addPeso1();
+            //j->addPeso1();
             return 1;
             //break;
         }
@@ -268,7 +268,227 @@ void Grafo::PRIM(int start){
     
 }
 
+bool Grafo::euleriano(){
+  
+    int eulerCont = 0;
+    for(int i = 0; i<this->tamanho; i++){
+        int j=0;
+        for(auto it: this->matrizAdj[i]){
+            
+            j++;
+        }
+        //cout<<"j:"<<j<<endl;
+        if((j%2) != 0){
+            eulerCont++;
+        }
+        if(eulerCont > 2){
+            cout<<"Nao eh euleriano"<<endl;
+            return false;
+        }
+    }
+    if(eulerCont == 0 || eulerCont == 2){
+        cout<<"Eh euleriano"<<endl;
+        return true;
+    }
+    else{
+        cout<<"Nao eh euleriano"<<endl;
+        return false;
+    }
+    return true;
+}
 
+//float Grafo::closeness(int indexOfNode) {
+//    vector<int> pesosDosCaminhos;
+//    for(auto i=0; i<this->getSize();i++)
+//    {
+//        if(i != indexOfNode)
+//            pesosDosCaminhos.push_back(this->dijkstraAlgorithm(indexOfNode,i).second);
+//    }
+//    float sumOfAllWeights = accumulate(pesosDosCaminhos.begin(),pesosDosCaminhos.end(),0);
+//    return 1/sumOfAllWeights;
+//}
+
+
+void Grafo::noMaiorAdj(){
+    int aux,bigger = 0, compare = -1;
+    for(int i = 0; i<this->tamanho; i++){
+        aux = this->matrizAdj[i].size();
+        if(aux>compare){
+            compare = aux;
+            bigger = i;
+        }
+    }
+    cout<<"No com mais adj: "<<bigger<< " Num de adj: "<<this->matrizAdj[bigger].size()<<endl;
+}
+bool Grafo::procura(int i, int j){
+    for(auto it : this->matrizAdj[i]){
+        if(it.getAdj() == j)
+            return true;
+    }
+    return false;
+}
+
+void Grafo::faz_fechamento() {
+    int i, j, k;
+
+    // inicializa��o da matriz de fechamento
+    fechamento = new int*[tamanho];
+    for(i = 0; i<tamanho;i++){
+        this->fechamento[i] =new int[tamanho];
+    }
+    for (i = 0; i < this->tamanho; i++){
+        for (j = 0; j < this->tamanho; j++){
+            
+            if (this->procura(i, j))
+                fechamento[i][j] = 1;
+            else
+                fechamento[i][j] = 0;
+        }
+    }
+    
+    // algoritmo de Warshall
+    for (k = 0; k < tamanho; k++)
+    {
+        for (i = 0; i < tamanho; i++)
+        {
+            if (fechamento[i][k])
+                for (j = 0; j < tamanho; j++)
+                    fechamento[i][j] = fechamento[i][j] || fechamento[k][j];
+        }
+    }
+}
+
+
+// algoritmo de dijkstra
+int Grafo::melhorCaminho(int s, int t) {
+
+    int* distancia = new int[this->tamanho];
+    bool* perm = new bool[this->tamanho];
+    int* caminho = new int(this->tamanho);
+    int corrente, i, k = s, dc, j = 0;
+    
+    faz_fechamento();
+    
+    if (!fechamento[s][t])
+        return -1;
+    
+    int menordist, novadist = 0; 
+    //inicializa��o
+    for (i = 0; i < this->tamanho; ++i) {
+        perm[i] = false;
+        distancia[i] = 999999;
+        caminho[i] = -1;
+    }
+    perm[s] = true;
+    distancia[s] = 0;
+    corrente = s;
+    while (corrente != t) {
+        menordist = 999999;
+        dc = distancia[corrente];
+        for (i = 0; i < this->tamanho; i++) {
+            if (!perm[i]) {
+                // if (l[corrente].procura(i))
+                novadist = dc + this->retornaPeso(corrente, i);
+                if (novadist < distancia[i]) {
+                    distancia[i] = novadist;
+                    caminho[i] = corrente;
+                }
+                if (distancia[i] < menordist) {
+                    menordist = distancia[i];
+                    k = i;
+                }
+            }
+        }
+        corrente = k;
+        
+        perm[corrente] = true;
+    }
+    
+    //imprimirDijkstra(s, t);
+    return distancia[t];
+}
+
+// imprime o caminho gerado pelo dijkstra ( inverte o caminho p/ imprimir s -> t)
+//void Grafo::imprimirDijkstra(int s, int t) {
+//    unsigned int i = caminho[t];
+//    vector<string> inverte;
+//    //cout << "Caminho detalhado: ";
+//    //cout << "Destino<-" << vertices[t].get_nome() << "<-";
+//    inverte.push_back(vertices[t].get_nome());
+//    while (i != s) {
+//        //cout << vertices[i].get_nome() << "<-";
+//        inverte.push_back(vertices[i].get_nome());
+//        i = caminho[i];
+//    }
+//    
+//    //cout << vertices[s].get_nome() << "<-Origem" << endl;
+//    inverte.push_back(vertices[s].get_nome());
+//    
+//    reverse(inverte.begin(), inverte.end());
+//    
+//    cout << "Caminho detalhado:" << endl << "Origem: ";
+//    for (i = 0; i < inverte.size(); i++)
+//        cout << inverte[i] << " -> ";
+//    cout << " :Destino" << endl;
+//    
+//}
+
+int Grafo::retornaPeso(int corrente, int i){
+
+    int j=0;
+    for(auto it : this->matrizAdj[corrente]){
+        if(it.getAdj() == i){
+            return it.getPeso();
+        }
+        j++;
+    }
+    return 999999;
+}
+
+void Grafo::rankingRecebidos(){//retorna os nos que mais receberam
+
+    vector<pair<int,int>> vet(this->tamanho);
+    for(int i=0; i<this->tamanho;i++){
+        vet[i].first= i;
+        vet[i].second = 0;
+    }
+    for(int i = 0; i<this->tamanho; i++){
+        for(auto it: this->matrizAdj[i]){
+            vet[it.getAdj()].second++;
+        }
+    }
+    vector<pair<int,int>> vet20;
+    
+
+    std::sort(vet.begin(), vet.end(), [](const std::pair<int,int> &left, const std::pair<int,int> &right) {
+        return left.second < right.second;
+    });
+    cout<<"Ranking mais receberam transacoes"<<endl;
+    for(int i = this->tamanho-1;i>(this->tamanho-20);i--){
+        cout<<"No: "<<vet[i].first<<"   qtd: "<<vet[i].second<<endl;
+    }
+    cout<<"----------------------------"<<endl;
+    
+}
+void Grafo::rankingEnviados(){
+    vector<pair<int,int>> vet(this->tamanho);
+    for(int i=0; i<this->tamanho;i++){
+        vet[i].first= i;
+        vet[i].second = 0;
+    }
+    for(int i = 0; i<this->tamanho; i++){
+        vet[i].second = this->matrizAdj[i].size();
+    }
+    std::sort(vet.begin(), vet.end(), [](const std::pair<int,int> &left, const std::pair<int,int> &right) {
+        return left.second < right.second;
+    });
+    
+    cout<<"Ranking mais realizaram transacoes"<<endl;
+    for(int i = this->tamanho-1;i>(this->tamanho-20);i--){
+        cout<<"No: "<<vet[i].first<<"   qtd: "<<vet[i].second<<endl;
+    }
+     cout<<"----------------------------"<<endl;
+}
 
 
 
